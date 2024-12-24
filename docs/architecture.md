@@ -39,4 +39,50 @@ Passport-Template follows a client-server architecture, with a React front-end c
 
 ## Diagrams
 
-[Include any relevant architecture or sequence diagrams here] 
+[Include any relevant architecture or sequence diagrams here]
+
+## Payments
+
+The application integrates with Stripe for processing payments. Stripe is used on both the front-end and back-end to handle payment flows.
+
+### Front-end Payment Components
+
+The `PaymentForm` component (`client/src/components/PaymentForm.js`) is responsible for collecting card details from the user. It uses the `loadStripe` function from `@stripe/stripe-js` to load the Stripe library and the `Elements` provider from `@stripe/react-stripe-js` to wrap the form.
+
+### Back-end Payment Routes
+
+The `/create-checkout-session` route (`server/routes/payments.js`) creates a new Checkout Session using the `stripe.checkout.sessions.create` method. It requires the following parameters:
+- `payment_method_types`: The types of payment methods accepted (e.g., card)
+- `line_items`: An array of items being purchased, including the price and quantity
+- `success_url`: The URL to redirect to after a successful payment
+- `cancel_url`: The URL to redirect to if the payment is canceled
+
+### Booking a Session with Payment
+
+When a user books a session, the `bookSession` function from the `useAuth` hook (`client/src/hooks/useAuth.js`) is called. This function sends a request to the server to create a new Checkout Session. After a successful payment, the `handlePaymentSuccess` function is called to complete the booking process.
+
+### Saving and Using a Payment Method
+
+The `getPaymentMethod` and `savePaymentMethod` functions in the `useAuth` hook are used to retrieve and save a user's payment method. The saved payment method is displayed to the user, allowing them to book a session with their saved card using the `handleSavedCardBooking` function.
+
+### Testing the Payment Flow
+
+To test the payment flow, use Stripe's test card numbers (e.g., 4242 4242 4242 4242). Note that in test mode, actual payments are not processed.
+
+### Deployment and Environment Variables
+
+Make sure to set the following environment variables for Stripe:
+- `STRIPE_SECRET_KEY`: The secret key for your Stripe account
+- `STRIPE_PUBLISHABLE_KEY`: The publishable key for your Stripe account
+
+Configure these variables in your deployment environment (e.g., Heroku, AWS) to ensure the application can communicate with Stripe in production.
+
+#### Environment Setup
+
+The `.env.example` files in the `client` and `server` directories show the required environment variables for the application. To set up your environment:
+
+1. Create a `.env` file in both the `client` and `server` directories.
+2. Copy the contents of the respective `.env.example` file into the `.env` file.
+3. Replace the placeholder values with your actual environment variable values.
+
+Note: The `.env` files should not be committed to version control, as they may contain sensitive information like API keys. 
