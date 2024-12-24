@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const logger = require('morgan')('combined');
 
 router.post('/create-checkout-session', async (req, res) => {
+  logger.info('POST /create-checkout-session');
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [
@@ -22,6 +24,7 @@ router.post('/create-checkout-session', async (req, res) => {
     cancel_url: `${process.env.CLIENT_URL}/cancel`,
   });
 
+  logger.info('Checkout session created successfully');
   res.json({ id: session.id });
 });
 

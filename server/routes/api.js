@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../database/db');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const logger = require('morgan')('combined');
 
 /**
  * Get all sessions
@@ -10,10 +11,13 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
  * @returns {Error} 500 - Internal server error
  */
 router.get('/sessions', async (req, res) => {
+    logger.info('GET /sessions');
     try {
         const sessions = await db.query('sessions', { columns: '*' });
+        logger.info('Fetched sessions successfully');
         res.json(sessions);
     } catch (error) {
+        logger.error('Error fetching sessions:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -25,10 +29,13 @@ router.get('/sessions', async (req, res) => {
  * @returns {Error} 500 - Internal server error
  */
 router.get('/sessions/:id', async (req, res) => {
+    logger.info('GET /sessions/:id');
     try {
         const session = await db.query('sessions', { columns: '*', match: { id: req.params.id } });
+        logger.info('Fetched session successfully');
         res.json(session);
     } catch (error) {
+        logger.error('Error fetching session:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -40,10 +47,13 @@ router.get('/sessions/:id', async (req, res) => {
  * @returns {Error} 500 - Internal server error
  */
 router.get('/profile/:id', async (req, res) => {
+    logger.info('GET /profile/:id');
     try {
         const profile = await db.query('profile', { columns: '*' });
+        logger.info('Fetched profile successfully');
         res.json(profile);
     } catch (error) {
+        logger.error('Error fetching profile:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -55,10 +65,13 @@ router.get('/profile/:id', async (req, res) => {
  * @returns {Error} 500 - Internal server error
  */
 router.get('/profile/:id', async (req, res) => {
+    logger.info('GET /profile/:id');
     try {
         const profile = await db.query('profile', { columns: '*', match: { id: req.params.id } });
+        logger.info('Fetched profile successfully');
         res.json(profile);
     } catch (error) {
+        logger.error('Error fetching profile:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -70,10 +83,13 @@ router.get('/profile/:id', async (req, res) => {
  * @returns {Error} 500 - Internal server error
  */
 router.get('/companies/:id/sessions', async (req, res) => {
+    logger.info('GET /companies/:id/sessions');
     try {
         const sessions = await db.query('sessions', { columns: '*', match: { companyId: req.params.id } });
+        logger.info('Fetched sessions successfully');
         res.json(sessions);
     } catch (error) {
+        logger.error('Error fetching sessions:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -87,8 +103,10 @@ router.get('/companies/:id/sessions', async (req, res) => {
 router.get('/companies/:id/sessions/:sessionId', async (req, res) => {
     try {
         const session = await db.query('sessions', { columns: '*', match: { id: req.params.sessionId, companyId: req.params.id } });
+        logger.info('Fetched session successfully');
         res.json(session);
     } catch (error) {
+        logger.error('Error fetching session:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -100,12 +118,15 @@ router.get('/companies/:id/sessions/:sessionId', async (req, res) => {
  * @returns {Error} 500 - Internal server error
  */
 router.post('/companies/:id/sessions', async (req, res) => {
+    logger.info('POST /companies/:id/sessions');
     const session = req.body;   
     session.companyId = req.params.id;
     try {
         const booking = await db.insert('sessions', session);
+        logger.info('Session created successfully');
         res.json(booking);
     } catch (error) {
+        logger.error('Error creating session:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -117,12 +138,15 @@ router.post('/companies/:id/sessions', async (req, res) => {
  * @returns {Error} 500 - Internal server error
  */
 router.put('/companies/:id/sessions/:sessionId', async (req, res) => {
+    logger.info('PUT /companies/:id/sessions/:sessionId');
     const session = req.body;
     session.companyId = req.params.id;
     try {
         const session = await db.update('sessions', req.params.sessionId, session);
+        logger.info('Session updated successfully');
         res.json(session);
     } catch (error) {
+        logger.error('Error updating session:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -136,15 +160,17 @@ router.put('/companies/:id/sessions/:sessionId', async (req, res) => {
 router.delete('/companies/:id/sessions/:sessionId', async (req, res) => {
     try {
         await db.delete('sessions', req.params.sessionId);
+        logger.info('Session deleted successfully');
         res.status(204).send();
     } catch (error) {
+        logger.error('Error deleting session:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
 router.post('/book-session', async (req, res) => {
     const { sessionId, paymentMethodId } = req.body;
-
+    logger.info('POST /book-session');
     const session = await db.getSession(sessionId);
 
     const checkoutSessionData = {
