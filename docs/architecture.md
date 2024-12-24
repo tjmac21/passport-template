@@ -10,6 +10,16 @@ Passport-Template follows a client-server architecture, with a React front-end c
 - **Components**: Reusable UI components, such as SessionBrief, Loading, etc.
 - **Hooks**: Custom React hooks for managing state and side effects, such as useAuth, useCompany, etc.
 
+#### Building the Client-side Application
+
+To create a production-ready build of the client-side application, run the following command in the `client` directory:
+
+```
+npm run build
+```
+
+This command will generate optimized and minified files in the `client/build` directory, which can be served by a web server or deployed to a hosting platform.
+
 ### Back-end (Node.js/Express)
 
 - **Routes**: Express routes that define the API endpoints and handle incoming requests.
