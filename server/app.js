@@ -7,14 +7,10 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const paymentsRouter = require('./routes/payments');
 const apiRouter = require('./routes/api');
 
 const app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -24,6 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
+app.use('/payments', paymentsRouter);
 
 const options = {
   definition: {

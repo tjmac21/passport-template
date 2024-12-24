@@ -13,7 +13,7 @@ import CreateSession from './pages/CreateSession';
 import { ProvideAuth, useAuth } from './useAuth';
 
 function App() {
-  const { isAuthenticated, login, signup, logout } = useAuth();
+  const { user, login, signup, logout } = useAuth();
 
   return (
     <Router>
@@ -23,12 +23,12 @@ function App() {
             <li>
               <Link to="/">Home</Link>
             </li>
-            {isAuthenticated && (
+            {user && (
               <li>
                 <Link to="/explore">Explore</Link>
               </li>
             )}
-            {!isAuthenticated && (
+            {!user && (
               <>
                 <li>
                   <Link to="/login">Login</Link>
@@ -38,7 +38,7 @@ function App() {
                 </li>
               </>
             )}
-            {isAuthenticated && (
+            {user && (
               <li>
                 <Button onClick={logout}>Logout</Button>
               </li>
@@ -48,7 +48,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          {isAuthenticated ? (
+          {user ? (
             <>
               <Route path="/explore" element={<Explore />} />
               <Route path="/profile" element={<Profile />} />

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Button } from '@mui/material';
 import { useCompany } from '../hooks/useCompany';
+import Loading from '../components/Loading';
 
 const CompanySession = () => {
   const { fetchSession, updateSession, deleteSession } = useCompany();
@@ -29,7 +30,7 @@ const CompanySession = () => {
   };
 
   if (!session) {
-    return <Typography>Loading session...</Typography>;
+    return <Loading text="Loading session..." />;
   }
 
   return (

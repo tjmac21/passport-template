@@ -191,3 +191,7 @@ USING (
         AND c.owner_id = auth.uid()
     )
 );
+
+ALTER TABLE auth.users ADD CONSTRAINT unique_email UNIQUE (email);
+
+ALTER TABLE auth.users ADD COLUMN payment_method_id TEXT; 

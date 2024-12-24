@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from 'react';
+import { useState, useContext, createContext, useEffect } from 'react';
 import Auth from '../auth';
 
 const authContext = createContext();
@@ -13,24 +13,39 @@ export const useAuth = () => {
 };
 
 function useProvideAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = Auth.onAuthStateChanged(setUser);
+    return () => unsubscribe();
+  }, []);
+
+  const getPaymentMethod = async () => {
+    const response = await fetch('/api/payment-method');
+    const data = await response.json();
+    return data.paymentMethod;
+  };
+
+  const savePaymentMethod = async (paymentMethodId) => {
+    await fetch('/api/payment-method', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentMethodId }),
+    });
+  };
 
   const login = async (email, password) => {
     const user = await Auth.signIn(email, password);
-    setIsAuthenticated(true);
     setUser(user);
   };
 
   const signup = async (email, password) => {
     const user = await Auth.signUp(email, password);
-    setIsAuthenticated(true);
     setUser(user);
   };
 
   const logout = async () => {
     await Auth.signOut();
-    setIsAuthenticated(false);
     setUser(null);
   };
 
@@ -47,8 +62,9 @@ function useProvideAuth() {
   };
 
   return {
-    isAuthenticated,
     user,
+    getPaymentMethod,
+    savePaymentMethod,
     login,
     signup,
     logout,

@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../database/db');
 const router = express.Router();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 /**
  * Get all sessions
@@ -139,6 +140,41 @@ router.delete('/companies/:id/sessions/:sessionId', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+});
+
+router.post('/book-session', async (req, res) => {
+    const { sessionId, paymentMethodId } = req.body;
+
+    const session = await db.getSession(sessionId);
+
+    const checkoutSessionData = {
+        payment_method_types: ['card'],
+        mode: 'payment',
+        line_items: [
+            {
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: session.name,
+                    },
+                    unit_amount: session.price * 100,
+                },
+                quantity: 1,
+            },
+        ],
+        success_url: `${process.env.CLIENT_URL}/success`,
+        cancel_url: `${process.env.CLIENT_URL}/session/${sessionId}`,
+    };
+
+    if (paymentMethodId) {
+        checkoutSessionData.payment_method = paymentMethodId;
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create(checkoutSessionData);
+
+    await db.bookSession(sessionId, req.user.id, paymentMethodId);
+
+    res.json({ sessionId: checkoutSession.id });
 });
 
 module.exports = router;

@@ -43,6 +43,20 @@ class Database {
 
     if (error) throw error
   }
+
+  
+  async bookSession(sessionId, userId, paymentMethodId) {
+    await supabase
+      .from('user_sessions')
+      .insert({ session_id: sessionId, user_id: userId });
+
+    if (paymentMethodId) {
+      await supabase
+        .from('profiles')
+        .update({ payment_method_id: paymentMethodId })
+        .eq('id', userId);
+    }
+  }
 }
 
 module.exports = new Database()

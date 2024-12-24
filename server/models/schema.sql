@@ -46,4 +46,6 @@ CREATE TABLE waitlists (
   session_id UUID REFERENCES sessions(id)
 );
 
-ALTER TABLE auth.users ADD CONSTRAINT unique_email UNIQUE (email); 
+ALTER TABLE auth.users ADD CONSTRAINT unique_email UNIQUE (email);
+
+ALTER TABLE auth.users ADD COLUMN payment_method_id TEXT; 
